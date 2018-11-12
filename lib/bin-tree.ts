@@ -13,6 +13,10 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
         this.add(entity);
     }
 
+    public isAutobalance(value: boolean) {
+        this.Autobalance = value;
+    }
+
     public add(entity: TEntity | TEntity[] | null): void {
         if(entity === null) return;
         if(Array.isArray(entity))  {
