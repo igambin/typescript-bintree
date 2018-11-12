@@ -8,7 +8,7 @@ const Tom50 = new User('Tom', 50);
 const Tom60 = new User('Tom', 60);
 const Tom70 = new User('Tom', 70);
 
-test('sample test', () => {
+test('binary tree can be created', () => {
     const bintree: BinTree<User> = new BinTree<User>(Tom10);
     expect(bintree).toBeTruthy();
 });
