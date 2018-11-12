@@ -61,10 +61,11 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
     private searchNode(act: Node<TEntity> | null, key: string): TEntity | null {
         if(act === null) return null;
         if(act.key() === key) return act.data;
-        let found: TEntity | null = this.searchNode(act.left, key);
-        if(found === null) found = this.searchNode(act.right, key);
-        if(found !== null) return found;
-        return null;
+        if(key < act.key() )  {
+            return this.searchNode(act.left, key);
+        } else {
+            return this.searchNode(act.right, key);
+        }
     }
 
     public getSubTreePreOrder() : TEntity[] {
