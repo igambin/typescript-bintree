@@ -6,21 +6,24 @@ export interface ISortable<TEntity> {
 export class BinTree<TEntity extends ISortable<TEntity>> {
 
     public Root : Node<TEntity> | null = null;
+    private Autobalance: boolean;
 
-    constructor(entity: TEntity | TEntity[] | null) {
+    constructor(entity: TEntity | TEntity[] | null, autobalance: boolean = false) {
+        this.Autobalance = autobalance;
+        this.add(entity);
+    }
+
+    public add(entity: TEntity | TEntity[] | null): void {
         if(entity === null) return;
         if(Array.isArray(entity))  {
-            this.addRange(entity);
+            entity.forEach( (entity: TEntity) => this.addNode(entity) );
         } else {
-            this.Root = new Node<TEntity>(entity);
+            this.addNode(entity);
         }
+        if(this.Autobalance) this.rebalanceTree();
     }
 
-    public addRange(entities: TEntity[]): void {
-        entities.forEach( (entity: TEntity) => this.add(entity) );
-    }
-
-    public add(entity: TEntity): void {
+    private addNode(entity: TEntity): void {
         const node = new Node<TEntity>(entity);
         if(this.Root === null) {
             this.Root = node;
@@ -46,6 +49,19 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
             }
         }
     } 
+
+    public search(key: string): TEntity | null {
+        return this.searchNode(this.Root, key);   
+    }
+
+    private searchNode(act: Node<TEntity> | null, key: string): TEntity | null {
+        if(act === null) return null;
+        if(act.key() === key) return act.data;
+        let found: TEntity | null = this.searchNode(act.left, key);
+        if(found === null) found = this.searchNode(act.right, key);
+        if(found !== null) return found;
+        return null;
+    }
 
     public getSubTreePreOrder() : TEntity[] {
         const result: TEntity[] = [];
@@ -109,6 +125,23 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
     public static parseFromJSONArray<T extends ISortable<T>>
         (serialized: string, entityFactory: (item: any) => T): BinTree<T> {
             return new BinTree<T>(JSON.parse(serialized).map( (x: T) => entityFactory(x)));
+    }
+
+    public rebalanceTree(): void
+    {
+        let nodes = this.getSubTreeInOrder();
+        this.Root = null;
+        this.rebalanceNodes(nodes);
+    }
+
+    private rebalanceNodes(right: TEntity[]) : void
+    {
+        if(right.length === 0) return;
+        let left: TEntity[] = right.splice(0, Math.ceil(right.length / 2));
+        let next: TEntity   = <TEntity> (left.length > right.length ?  left.pop() : right.shift());
+        this.addNode(next);
+        this.rebalanceNodes(left);
+        this.rebalanceNodes(right);
     }
 }
 
