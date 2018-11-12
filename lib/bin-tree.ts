@@ -80,6 +80,19 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
         if(node.right!== null) this.collectDataPreOrder(result, node.right);
     }
 
+    public getSubTreePostOrder() : TEntity[] {
+        const result: TEntity[] = [];
+        if(this.Root !== null) this.collectDataPostOrder(result, this.Root);
+        return result;
+    }
+
+    private collectDataPostOrder(result: TEntity[], node: Node<TEntity>) {
+        if(result === undefined) throw new Error('result should at least be initialized');
+        if(node.left !== null) this.collectDataPostOrder(result, node.left);
+        if(node.right!== null) this.collectDataPostOrder(result, node.right);
+        result.push(node.data);
+    }
+
     public getSubTreeByDepth() : TEntity[] {
         const preresult: TEntity[][] = [];
         if(this.Root !== null) this.collectDataByDepth(preresult, this.Root);

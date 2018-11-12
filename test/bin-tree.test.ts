@@ -87,6 +87,16 @@ test('get nodes "pre order"', () => {
     expect(preOrder).toEqual(['Tom40','Tom20','Tom10','Tom30','Tom50']);
 });
 
+test('get nodes "post order"', () => {
+    //Tree
+    //        4
+    //    2       5
+    //  1   3
+    const bintree: BinTree<User> = new BinTree<User>([Tom40, Tom20, Tom50, Tom10, Tom30]);
+    const preOrder = bintree.getSubTreePostOrder().map(n => n.key());
+    expect(preOrder).toEqual(['Tom10','Tom30','Tom20','Tom50','Tom40']);
+});
+
 test('get nodes "by depth"', () => {
     //Tree
     //        4
