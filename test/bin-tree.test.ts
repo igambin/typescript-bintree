@@ -1,4 +1,7 @@
-import {BinTree, User, Node, ISortable} from "../lib/bin-tree";
+import {BinTree} from "../lib/bin-tree";
+import {User} from "../lib/user";
+import {IUser} from "../lib/i-user";
+import {Node} from "../lib/node";
 
 const Tom10 = new User('Tom', 10);
 const Tom20 = new User('Tom', 20);
@@ -15,10 +18,10 @@ test('binary tree can be created', () => {
 
 test('single root node should be leaf AND root', () => {
     const bintree: BinTree<User> = new BinTree<User>(Tom20);
-    expect(bintree && bintree.Root).toBeTruthy();
-    if(bintree.Root) {
-        expect(bintree.Root.isLeaf()).toBe(true);
-        expect(bintree.Root.isRoot()).toBe(true);
+    expect(bintree && bintree.root).toBeTruthy();
+    if(bintree.root) {
+        expect(bintree.root.isLeaf()).toBe(true);
+        expect(bintree.root.isRoot()).toBe(true);
     }
 });
 
@@ -44,17 +47,17 @@ test('user NOT contained in tree will NOT be found', () => {
 
 test('root with one child node should NOT be leaf, wheras child should NOT be root', () => {
     const bintree: BinTree<User> = new BinTree<User>([Tom20, Tom10]);
-    expect(bintree && bintree.Root && bintree.Root.left).toBeTruthy();
-    if(bintree.Root && bintree.Root.left) {
-        expect(bintree.Root.isLeaf()).toBe(false);
-        expect(bintree.Root.left.isRoot()).toBe(false);
+    expect(bintree && bintree.root && bintree.root.left).toBeTruthy();
+    if(bintree.root && bintree.root.left) {
+        expect(bintree.root.isLeaf()).toBe(false);
+        expect(bintree.root.left.isRoot()).toBe(false);
     }
 });
 
 test('should add left and right child and set current node as parent of them', () => {
     const bintree: BinTree<User> = new BinTree<User>(Tom20);
     bintree.add([Tom10, Tom30]);
-    const rootNode:   Node<User> | null = bintree.Root;
+    const rootNode:   Node<User> | null = bintree.root;
     const leftChild:  Node<User> | null = rootNode ? rootNode.left : null;
     const rightChild: Node<User> | null = rootNode ? rootNode.right : null;
     expect(rootNode && leftChild && rightChild).toBeTruthy();
@@ -165,17 +168,17 @@ test('json stringify should fail on nodes with children', () => {
 
 test('mapping method should map each node', () => {
     const bintree: BinTree<User> = new BinTree<User>([Tom20, Tom10, Tom30 ]);
-    const result = bintree.map((x: User) => `${x.Name}${x.Age * 3}`);
+    const result = bintree.map((x: User) => `${x.name}${x.age * 3}`);
     expect(result).toEqual(['Tom30','Tom60','Tom90']);
 });
 
 test('correct depth of node', () => {
     const bintree: BinTree<User> = new BinTree<User>([Tom30, Tom20, Tom10 ]);
-    expect(bintree && bintree.Root && bintree.Root.left && bintree.Root.left.left).toBeTruthy();
-    if(bintree && bintree.Root && bintree.Root.left && bintree.Root.left.left) {
-        expect(bintree.Root.getCurrentDepth()).toEqual(0);
-        expect(bintree.Root.left.getCurrentDepth()).toEqual(1);
-        expect(bintree.Root.left.left.getCurrentDepth()).toEqual(2);
+    expect(bintree && bintree.root && bintree.root.left && bintree.root.left.left).toBeTruthy();
+    if(bintree && bintree.root && bintree.root.left && bintree.root.left.left) {
+        expect(bintree.root.getCurrentDepth()).toEqual(0);
+        expect(bintree.root.left.getCurrentDepth()).toEqual(1);
+        expect(bintree.root.left.left.getCurrentDepth()).toEqual(2);
     }
 });
 
@@ -185,8 +188,8 @@ test('should return the correct subtree size', () => {
     //    2       5
     //  1   3
     const bintree: BinTree<User> = new BinTree<User>([Tom40, Tom20, Tom50, Tom10, Tom30]);
-    if(bintree !== null && bintree.Root !== null)
-    expect(bintree.Root.getSubtreeSize()).toEqual(5);
+    if(bintree !== null && bintree.root !== null)
+    expect(bintree.root.getSubtreeSize()).toEqual(5);
 });
 
 test('serializeAsJSONArray/parseFromJSONArray should return a string that can be parsed back into a bintree', () => {
@@ -198,14 +201,14 @@ test('serializeAsJSONArray/parseFromJSONArray should return a string that can be
     const bintree: BinTree<User> = new BinTree<User>(nodes);
     const json: string = bintree.serializeAsJSONArray();
     expect(json).toEqual(JSON.stringify(nodes));
-    const clonedTree = BinTree.parseFromJSONArray<User>(json, (data: User) => new User(data.Name, data.Age));
+    const clonedTree = BinTree.parseFromJSONArray<User>(json, (data: IUser) => new User(data.name, data.age));
     expect(clonedTree).toBeDefined();
     expect(clonedTree.getSubTreeInOrder()).toEqual(bintree.getSubTreeInOrder());
-    expect(bintree && bintree.Root && bintree.Root.left && bintree.Root.left.left).toBeTruthy();
-    expect(clonedTree && clonedTree.Root && clonedTree.Root.left && clonedTree.Root.left.left).toBeTruthy();
-    if(     bintree     && bintree.Root     && bintree.Root.left    && bintree.Root.left.left
-        &&  clonedTree  && clonedTree.Root  && clonedTree.Root.left && clonedTree.Root.left.left) {
-        expect(bintree.Root.left.left.getCurrentDepth()).toEqual(clonedTree.Root.left.left.getCurrentDepth());
+    expect(bintree && bintree.root && bintree.root.left && bintree.root.left.left).toBeTruthy();
+    expect(clonedTree && clonedTree.root && clonedTree.root.left && clonedTree.root.left.left).toBeTruthy();
+    if(     bintree     && bintree.root     && bintree.root.left    && bintree.root.left.left
+        &&  clonedTree  && clonedTree.root  && clonedTree.root.left && clonedTree.root.left.left) {
+        expect(bintree.root.left.left.getCurrentDepth()).toEqual(clonedTree.root.left.left.getCurrentDepth());
     }
 });
 

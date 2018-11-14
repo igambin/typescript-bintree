@@ -1,20 +1,18 @@
-export interface ISortable<TEntity> {
-    key() : string;
-    compare(to: TEntity) : number;
-}
+import { Node } from "./node";
+import { ISortable } from "./i-sortable";
 
 export class BinTree<TEntity extends ISortable<TEntity>> {
 
-    public Root : Node<TEntity> | null = null;
-    private Autobalance: boolean;
+    public root : Node<TEntity> | null = null;
+    private autobalance: boolean;
 
     constructor(entity: TEntity | TEntity[] | null, autobalance: boolean = false) {
-        this.Autobalance = autobalance;
+        this.autobalance = autobalance;
         this.add(entity);
     }
 
     public isAutobalance(value: boolean) {
-        this.Autobalance = value;
+        this.autobalance = value;
     }
 
     public add(entity: TEntity | TEntity[] | null): void {
@@ -24,15 +22,15 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
         } else {
             this.addNode(entity);
         }
-        if(this.Autobalance) this.rebalanceTree();
+        if(this.autobalance) this.rebalanceTree();
     }
 
     private addNode(entity: TEntity): void {
         const node = new Node<TEntity>(entity);
-        if(this.Root === null) {
-            this.Root = node;
+        if(this.root === null) {
+            this.root = node;
         } else {
-            this.insert(this.Root, node);
+            this.insert(this.root, node);
         }
     }
 
@@ -55,7 +53,7 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
     } 
 
     public search(key: string): TEntity | null {
-        return this.searchNode(this.Root, key);   
+        return this.searchNode(this.root, key);   
     }
 
     private searchNode(act: Node<TEntity> | null, key: string): TEntity | null {
@@ -70,7 +68,7 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
 
     public getSubTreePreOrder() : TEntity[] {
         const result: TEntity[] = [];
-        if(this.Root !== null) this.collectDataPreOrder(result, this.Root);
+        if(this.root !== null) this.collectDataPreOrder(result, this.root);
         return result;
     }
 
@@ -83,7 +81,7 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
 
     public getSubTreePostOrder() : TEntity[] {
         const result: TEntity[] = [];
-        if(this.Root !== null) this.collectDataPostOrder(result, this.Root);
+        if(this.root !== null) this.collectDataPostOrder(result, this.root);
         return result;
     }
 
@@ -96,7 +94,7 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
 
     public getSubTreeByDepth() : TEntity[] {
         const preresult: TEntity[][] = [];
-        if(this.Root !== null) this.collectDataByDepth(preresult, this.Root);
+        if(this.root !== null) this.collectDataByDepth(preresult, this.root);
         const result: TEntity[] = [];
         preresult.forEach((row) => row.forEach((data) => result.push(data)));
         return result;
@@ -113,7 +111,7 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
 
     public getSubTreeInOrder() : TEntity[] {
         const result: TEntity[] = [];
-        if(this.Root !== null) this.collectDataInOrder(result, this.Root);
+        if(this.root !== null) this.collectDataInOrder(result, this.root);
         return result;
     }
 
@@ -126,7 +124,7 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
 
     public map<TOut>(mapping: (x: TEntity) => TOut) : TOut[] {
         const result : TOut[] = [];
-        if(this.Root !== null) this.mapNodes(result, this.Root, mapping);  
+        if(this.root !== null) this.mapNodes(result, this.root, mapping);  
         return result;  
     }
 
@@ -148,7 +146,7 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
     public rebalanceTree(): void
     {
         let nodes = this.getSubTreeInOrder();
-        this.Root = null;
+        this.root = null;
         this.rebalanceNodes(nodes);
     }
 
@@ -163,63 +161,4 @@ export class BinTree<TEntity extends ISortable<TEntity>> {
     }
 }
 
-export class Node<TEntity extends ISortable<TEntity>> {
 
-    public parent : Node<TEntity> | null = null;
-    public left   : Node<TEntity> | null = null;
-    public right  : Node<TEntity> | null = null;
-
-    constructor(
-        public data: TEntity
-        ) {
-    }
-
-    public key(): string {
-        return this.data.key();
-    }
-
-    public isRoot(): boolean {
-        return this.parent === null;
-    }
-
-    public isLeaf(): boolean {
-        return this.left === null && this.right === null;
-    }
-
-    public getCurrentDepth(): number {
-        let depth = 0;
-        let parent = this.parent;
-        while(parent !== null) {
-            depth++;
-            parent = parent.parent;
-        }
-        return depth;
-    }
-
-    public getSubtreeSize(): number {
-        let count = 1;
-        if(this.left !== null) count += this.left.getSubtreeSize();
-        if(this.right !== null) count += this.right.getSubtreeSize();
-        return count;
-    }
-}
-
-export class User implements ISortable<User> {
-    public Name : string;
-    public Age  : number; 
-
-    constructor(name: string, age: number) {
-        this.Name = name;
-        this.Age = age;        
-    }
-
-    public key() : string {
-        return `${this.Name}${this.Age}`;
-    }
-
-    public compare(to: User): number {
-        if(this.key() < to.key()) { return -1; }
-        if(this.key() > to.key()) { return 1; }
-        return 0;
-    }
-}
